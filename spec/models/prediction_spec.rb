@@ -159,7 +159,7 @@ describe Prediction do
     describe 'popular predictions' do
     
       it "should have a finder for recent popular predictions" do
-        prediction1 = create_valid_prediction(:created_at => 2.weeks.ago, :deadline => 4.days.from_now)
+        prediction1 = create_valid_prediction(:created_at => 1.week.ago, :deadline => 4.days.from_now)
         create_valid_response(:prediction => prediction1)
         prediction2 = create_valid_prediction(:created_at => 2.days.ago, :deadline => 2.days.from_now)
         prediction3 = create_valid_prediction(:created_at => 1.week.ago, :deadline => 3.days.from_now)
@@ -170,22 +170,22 @@ describe Prediction do
       end
 
       it "excludes overdue predictions" do
-        prediction1 = create_valid_prediction(:created_at => 2.weeks.ago, :deadline => 1.day.ago)
-        prediction2 = create_valid_prediction(:created_at => 2.weeks.ago, :deadline => 1.day.from_now)
+        prediction1 = create_valid_prediction(:created_at => 1.week.ago, :deadline => 1.day.ago)
+        prediction2 = create_valid_prediction(:created_at => 1.week.ago, :deadline => 1.day.from_now)
         Prediction.popular.should == [prediction2]
       end
 
       it "excludes judged (known) predictions" do
-        prediction1 = create_valid_prediction(:created_at => 2.weeks.ago, :deadline => 1.day.from_now)
+        prediction1 = create_valid_prediction(:created_at => 1.week.ago, :deadline => 1.day.from_now)
         create_valid_judgement(:prediction => prediction1, :outcome => false)
-        prediction2 = create_valid_prediction(:created_at => 2.weeks.ago, :deadline => 1.day.from_now)
+        prediction2 = create_valid_prediction(:created_at => 1.week.ago, :deadline => 1.day.from_now)
         Prediction.popular.should == [prediction2]
       end
       
-      it "excludes predictions made more than a month ago" do
-        create_valid_prediction(:created_at => 2.months.ago, :deadline => 1.day.from_now)
-        create_valid_prediction(:created_at => 3.months.ago, :deadline => 2.days.from_now)
-        create_valid_prediction(:created_at => 4.months.ago, :deadline => 3.days.from_now)
+      it "excludes predictions made more than 2 weeks ago" do
+        create_valid_prediction(:created_at => 3.weeks.ago, :deadline => 1.day.from_now)
+        create_valid_prediction(:created_at => 4.weeks.ago, :deadline => 2.days.from_now)
+        create_valid_prediction(:created_at => 5.weeks.ago, :deadline => 3.days.from_now)
         Prediction.popular.should be_empty
       end
       
@@ -233,12 +233,30 @@ describe Prediction do
         
         Prediction.unjudged.should == [past]
       end
-      
+
       it 'should order by deadline' do
         long_ago = create_valid_prediction(:deadline => 2.days.ago)
         longer_ago = create_valid_prediction(:deadline => 2.weeks.ago)
         
         Prediction.unjudged.should == [long_ago, longer_ago]
+      end
+
+      it 'should return currently unjudged predictions with previous judgements' do
+        rejudged = create_valid_prediction
+        rejudged.judge!(:right, nil)
+        sleep 1 # second granularity on judgement created_at
+        rejudged.judge!(nil, nil)
+
+        Prediction.unjudged.should == [rejudged]
+      end
+
+      it 'should not return currently judged predictions with previous unknown judgements' do
+        rejudged = create_valid_prediction
+        rejudged.judge!(nil, nil)
+        sleep 1 # second granularity on judgement created_at
+        rejudged.judge!(:right, nil)
+
+        Prediction.unjudged.should == []
       end
     end
     

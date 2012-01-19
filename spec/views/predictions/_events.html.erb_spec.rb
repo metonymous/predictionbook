@@ -18,10 +18,14 @@ describe "predictions/response.html.erb" do
       l.should have_selector('li~li')
     end
   end
-  it 'should show the responses relative_confidence' do
-    @wager.stub!(:relative_confidence).and_return(70)
+  it 'should show the responses confidence' do
+    @wager.stub!(:confidence).and_return(30)
     render_partial
+<<<<<<< HEAD
     rendered.should contain(/70%/)
+=======
+    response.should have_text(/30%/)
+>>>>>>> master
   end
   it 'should not show nil relative_confidences' do
     @wager.should_not_receive(:relative_confidence)
@@ -38,11 +42,14 @@ describe "predictions/response.html.erb" do
     render_partial
     rendered.should have_selector('span', :content => '3 days ago')
   end
+<<<<<<< HEAD
   it 'should show if response is in disagreement' do
     @wager.stub!(:agree?).and_return(false)
     render_partial
     rendered.should contain(/against/)
   end
+=======
+>>>>>>> master
   describe 'should include any supplied comments' do
     before(:each) do
       @wager.stub!(:comment).and_return(@comment = mock('comment'))

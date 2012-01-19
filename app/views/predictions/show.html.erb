@@ -15,11 +15,32 @@
   This prediction is <strong>private</strong>. <%= render :partial => 'predictions/private_note' %>
 </p>
 <%- end -%>
+<<<<<<< HEAD
 <% if user_signed_in? && !@prediction.withdrawn? -%>
 <div id="judgement">
   <h2>Judge this prediction</h2>
   <p class="note">Only judge this prediction once its outcome is known.<br />Record your opinion below.</p>
   <%= form_tag(judge_prediction_path(@prediction)) do %>
+=======
+<%= render :partial => 'predictions/events' %>
+<% if logged_in? -%>
+<div id='response'>
+  <%= render :partial => 'responses/form' %>
+</div>
+<div id='notification'>
+<h2>Email Notifications</h2>
+<div id="deadline_notification"><%= render :partial => @deadline_notification %></div>
+<div id="response_notification"><%= render :partial => @response_notification %></div>
+</div>
+<% else -%>
+<p><span class='notice'>Please <%= link_to 'log in', login_path %> to respond to or judge prediction</span></p>
+<% end -%>
+<% if logged_in? && !@prediction.withdrawn? -%>
+<div id="judgement">
+  <h2>Judge this prediction</h2>
+  <p class="note">Only judge this prediction once its outcome is known.<br />Record your opinion above, <strong>not</strong> here!</p>
+  <% form_tag(judge_prediction_path(@prediction)) do %>
+>>>>>>> master
     <%=  outcome_button 'Unknown' %>
     <%=  outcome_button 'Right' %>
     <%=  outcome_button 'Wrong' %>
@@ -31,13 +52,14 @@
       or if it would not be possible to decide its outcome.
     </p>
     <% form_for([:withdraw, @prediction], :html => {:method => :post}) do |f| %>
-      <%= f.submit 'Withdraw Prediction', :confirm => 'Are you sure you want to withdraw this prediction' %>
+      <%= f.submit 'Withdraw Prediction', :confirm => 'Are you sure you want to withdraw this prediction?' %>
     <% end %>
   </div>
   <% end %>
   <br />
 </div>
 <% end %>
+<<<<<<< HEAD
 <%= render 'predictions/events' %>
 <% if user_signed_in? -%>
 <div id='response'>
@@ -51,3 +73,5 @@
 <% else -%>
 <p><span class='notice'>Please <%= link_to 'log in', new_user_session_path %> to respond to or judge prediction</span></p>
 <% end -%>
+=======
+>>>>>>> master

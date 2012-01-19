@@ -13,15 +13,18 @@ class Prediction < ActiveRecord::Base
   scope :not_private, where(:private => false)
   
   def self.unjudged
-    not_private.not_withdrawn.includes(:judgements).rsort(:deadline).select(&:due_for_judgement?)
+    not_private.not_withdrawn.rsort(:deadline).all(:include => :judgements,
+      :conditions => '(SELECT outcome AS most_recent_outcome FROM judgements WHERE prediction_id = predictions.id ORDER BY created_at DESC LIMIT 1) IS NULL AND deadline < UTC_TIMESTAMP()')
   end
   
   def self.judged
-    not_private.not_withdrawn(:include => :judgements).reject(&:unknown?).rsort(:judged_at)
+    not_private.not_withdrawn.all(:include => :judgements,
+      :conditions => '(SELECT outcome AS most_recent_outcome FROM judgements WHERE prediction_id = predictions.id ORDER BY created_at DESC LIMIT 1) IS NOT NULL',
+      :order => 'judgements.created_at DESC')
   end
   
   def self.future
-    sort(:deadline).not_private.not_withdrawn(:include => :judgements).select { |p| p.unknown? && !p.overdue? }
+    sort(:deadline).not_private.not_withdrawn.all(:include => :judgements, :conditions => "judgements.outcome IS NULL AND deadline > UTC_TIMESTAMP()")
   end
   
   def self.recent
@@ -32,7 +35,7 @@ class Prediction < ActiveRecord::Base
     opts = {
       :include => :responses, # Eager loading of :judgements breaks judgement and unknown?
       :conditions => [
-        'predictions.deadline > UTC_TIMESTAMP() AND predictions.created_at > ?', 1.month.ago
+        'predictions.deadline > UTC_TIMESTAMP() AND predictions.created_at > ?', 2.weeks.ago
       ],
       :order => 'count(responses.prediction_id) DESC, predictions.deadline ASC',
       :group => 'predictions.id',

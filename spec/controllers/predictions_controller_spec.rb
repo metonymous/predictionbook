@@ -59,8 +59,8 @@ describe PredictionsController do
         get :happenstance
         assigns[:unjudged].should == @mock_collection
       end
-      it 'should limit the predictions by 3' do
-        @mock_collection.should_receive(:limit).with(3).and_return(@mock_collection)
+      it 'should limit the predictions by 5' do
+        @mock_collection.should_receive(:limit).with(5).and_return(@mock_collection)
         get :happenstance
       end
     end
@@ -73,8 +73,8 @@ describe PredictionsController do
         get :happenstance
         assigns[:judged].should == @mock_collection
       end
-      it 'should limit the predictions by 3' do
-        @mock_collection.should_receive(:limit).with(3).and_return(@mock_collection)
+      it 'should limit the predictions by 5' do
+        @mock_collection.should_receive(:limit).with(5).and_return(@mock_collection)
         get :happenstance
       end
     end
@@ -87,8 +87,8 @@ describe PredictionsController do
         get :happenstance
         assigns[:responses].should == @mock_collection
       end
-      it 'should limit the comments by 6' do
-        @mock_collection.should_receive(:limit).with(6).and_return(@mock_collection)
+      it 'should limit the comments by 25' do
+        @mock_collection.should_receive(:limit).with(25).and_return(@mock_collection)
         get :happenstance
       end
     end
@@ -101,8 +101,8 @@ describe PredictionsController do
         get :happenstance
         assigns[:recent].should == @mock_collection
       end
-      it 'should limit the predictions by 3' do
-        @mock_collection.should_receive(:limit).with(3).and_return(@mock_collection)
+      it 'should limit the predictions by 5' do
+        @mock_collection.should_receive(:limit).with(5).and_return(@mock_collection)
         get :happenstance
       end
     end
